@@ -23,3 +23,5 @@ This is the backend version of the Angular bootstrap that I made. Something to g
 This app uses basic MVC with services as global helpers. Feel free to make changes and create better solutions. I was going to add option to use postgres but eh mayber later. Also sorry about the very sad test suite.
 
 Also I've made bit leaky error reporting to end-user (sends stack traces to everyone), but it shouldn't matter unless you want to use it in production.
+
+To disable authentication you can comment out ```router.use("", auth.authenticate);``` in config/routes.js and probably ```router.use("", auth.onlyAdmin);``` if you want to use those routes too.
