@@ -7,7 +7,7 @@ This is the backend version of the Angular bootstrap that I made. Something to g
 # How to install
 1. Install Node.js and nvm if you don't have them by now. Newest versions suit very well. 4.-something if you want the production-stable version. Basically it should work if you write ```curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.4/install.sh | bash``` to your terminal. Then ```nvm install 6.3.1``` and maybe ```nvm use 6.3.1```.
 2. Clone this repository and go to the root and enter ```npm i``` or ```npm install```.
-3. This app uses dotenv for storing environment variables, copy the ```.dev-env``` file in the root of this folder and name it to ```.env```. If you want to use Travis or Heroku remember to add your variables to their config. Or for your own server create your own production ```.env```.
+3. This app uses dotenv for storing environment variables, copy the ```.dev-env``` file in the root of this folder and name it to ```.env``` e.g. ```cp .dev-env .env```. If you want to use Travis or Heroku remember to add your variables to their config. Or for your own server create your own production ```.env```.
 4. This app uses MongoDB as database so you need to either install MongoDB locally or use [mlab](https://mlab.com). I recommend mlab for its easy of use.
 5. For better development experience it's recommended to use Postman for generating requests to your app. [Here's a link to Chrome plugin](https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop). For making requests you should set your content-type to application/json and if you have authentication enabled remember to add X-Access-Token -header with valid token.
 6. Now you're all set, enter ```npm start``` to run the development server.

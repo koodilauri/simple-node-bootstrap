@@ -4,6 +4,7 @@ const express = require("express");
 const router = new express.Router();
 
 const auth = require("../middleware/authentication");
+const errorHandler = require("../middleware/errorHandler");
 
 const itemCtrl = require("../controllers/item");
 const userCtrl = require("../controllers/user");
@@ -19,7 +20,7 @@ router.get("/auth", auth.authenticate, authTest);
 router.post("/login", userCtrl.loginUser);
 router.post("/user", userCtrl.saveOne);
 
-router.use("", auth.authenticate);
+// router.use("", auth.authenticate);
 
 // Routes for all users
 
@@ -32,9 +33,11 @@ router.put("/user/:id", userCtrl.updateOne);
 
 // Routes accessisable only for admin
 
-router.use("", auth.onlyAdmin);
+// router.use("", auth.onlyAdmin);
 
 router.get("/user", userCtrl.findAll);
 router.delete("/user/:id", userCtrl.deleteOne);
+
+router.use("", errorHandler.handleErrors);
 
 module.exports = router;
