@@ -5,45 +5,39 @@ const passwordHelper = require("../config/passwordHelper");
 
 const User = require("../models/User");
 
-const ValidationError = require("../config/errors").ValidationError;
+const errors = require("../config/errors");
 
-module.exports.findAll = (req, res) => {
+module.exports.findAll = (req, res, next) => {
   User
   .findAll()
   .then(users => {
     res.status(200).send(users);
   })
-  .catch(err => {
-    res.status(500).send({
-      location: "User findAll .catch other",
-      message: "Getting all Users caused an internal server error.",
-      error: err,
-    });
-  });
+  .catch(err => next(err));
 };
 
-module.exports.updateOne = (req, res) => {
+module.exports.updateOne = (req, res, next) => {
   const user = req.body;
 
   Promise.resolve()
   .then(() => {
     if (req.user.id.toString() !== req.params.id && req.user.role !== "admin") {
-      throw new ValidationError("Missing privileges to edit User.");
+      throw new errors.ForbiddenError("Missing privileges to edit User.");
     } else if (!user.password && req.user.role !== "admin") {
-      throw new ValidationError("No password supplied.");
+      throw new errors.AuthenticationError("No password supplied.");
     } else if (user.newPassword && !user.newPasswordConf || !user.newPassword && user.newPasswordConf) {
-      throw new ValidationError("No new password or confirmation.");
+      throw new errors.AuthenticationError("No new password or confirmation.");
     } else if (user.newPassword && user.newPasswordConf && user.newPassword !== user.newPasswordConf) {
-      throw new ValidationError("New password didn't match confirmation.");
+      throw new errors.AuthenticationError("New password didn't match confirmation.");
     } else {
       return User.findOne({ id: req.params.id });
     }
   })
   .then(foundUser => {
     if (!foundUser) {
-      throw new ValidationError("No User found.");
+      throw new errors.ValidationError("No User found.");
     } else if (user.password && !passwordHelper.comparePassword(user.password, foundUser.passwordHash)) {
-      throw new ValidationError("Wrong password.");
+      throw new errors.AuthenticationError("Wrong password.");
     }
     const strippedUser = Object.assign({}, user);
     if (req.user.id.toString() === req.params.id) {
@@ -57,104 +51,58 @@ module.exports.updateOne = (req, res) => {
   .then(rows => {
     res.status(200).send();
   })
-  .catch(err => {
-    if (err.name === "ValidationError") {
-      res.status(400).send({
-        location: "User updateOne .catch ValidationError",
-        message: err.message,
-        error: err,
-      });
-    } else {
-      res.status(500).send({
-        location: "User updateOne .catch other",
-        message: "Updating User caused an internal server error.",
-        error: err,
-      });
-    }
-  });
+  .catch(err => next(err));
 };
 
-module.exports.saveOne = (req, res) => {
+module.exports.saveOne = (req, res, next) => {
   const user = req.body;
 
   Promise.resolve()
   .then(() => {
     if (!user.firstname || !user.lastname || !user.email || !user.password) {
-      throw new ValidationError("Missing fields.");
+      throw new errors.ValidationError("Missing fields.");
     } else if (user.password < 8) {
-      throw new ValidationError("Password too short.");
+      throw new errors.ValidationError("Password too short.");
     } else {
       return User.findOne({ email: user.email });
     }
   })
   .then(foundUser => {
     if (foundUser) {
-      throw new ValidationError("User already exists with the same email.");
+      throw new errors.ValidationError("User already exists with the same email.");
     } else {
       user.passwordHash = passwordHelper.hashPassword(user.password);
       return User.saveOne(user);
     }
   })
   .then(savedUser => {
-    res.status(200).send("success");
+    res.status(200).send();
   })
-  .catch(err => {
-    if (err.name === "ValidationError") {
-      res.status(400).send({
-        location: "User saveOne .catch ValidationError",
-        message: err.message,
-        error: err,
-      });
-    } else {
-      res.status(500).send({
-        location: "User saveOne .catch other",
-        message: "Registering new User caused an internal server error.",
-        error: err,
-      });
-    }
-  });
+  .catch(err => next(err));
 };
 
-module.exports.deleteOne = (req, res) => {
+module.exports.deleteOne = (req, res, next) => {
   User
   .delete({ id: req.params.id })
   .then(deletedRows => {
     if (deletedRows !== 0) {
       res.status(200).send();
     } else {
-      res.status(404).send({
-        location: "User deleteOne deletedRows === 0",
-        message: "No User found",
-        error: {},
-      });
+      throw new errors.NotFoundError("No user found.");
     }
   })
-  .catch(err => {
-    res.status(500).send({
-      location: "User deleteOne .catch other",
-      message: "Deleting User caused an internal server error.",
-      error: err,
-    });
-  });
+  .catch(err => next(err));
 };
 
-module.exports.loginUser = (req, res) => {
+module.exports.loginUser = (req, res, next) => {
   User
   .findOne({ email: req.body.email })
   .then(user => {
     if (!user) {
-      res.status(401).send({
-        location: "User loginUser !user",
-        message: "Logging in failed authentication",
-        error: "",
-      });
+      throw new errors.NotFoundError("No user found.");
     } else {
       if (!passwordHelper.comparePassword(req.body.password, user.passwordHash)) {
-        res.status(403).send({
-          location: "User loginUser !comparePassword",
-          message: "Wrong password",
-          error: "",
-        });
+        throw new errors.AuthenticationError("Incorrect password.");
       } else {
         const token = TokenGenerator.generateToken(user);
         user.passwordHash = undefined;
@@ -165,11 +113,5 @@ module.exports.loginUser = (req, res) => {
       }
     }
   })
-  .catch(err => {
-    res.status(500).send({
-      location: "User loginUser .catch other",
-      message: "Logging in caused an internal server error.",
-      error: err,
-    });
-  });
+  .catch(err => next(err));
 };

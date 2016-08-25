@@ -9,7 +9,7 @@
   "scripts": {
     "lint": "eslint ./**/*.js || true",
     "lint:fix": "eslint ./**/*.js --fix",
-    "start": "nodemon app.js",
+    "start": "node ./config/npm-check-dev.js && nodemon app.js || node app.js",
     "pm2:start": "pm2 start -n myapp-backend app.js",
     "db": "node db/node_script",
     "test": "istanbul cover node_modules/mocha/bin/_mocha --require test/testhelper.js test/**/*.js",

@@ -37,7 +37,7 @@ module.exports.addTestData = () => Promise.all([
     firstname: "Admin",
     lastname: "Jokunen",
     email: "admin@asdf.asdf",
-    passwordHash: "$2a$10$Fs0N7KD/xUH4NAfW2s1MoOh/yH3G7mAtGycMY5tMUvCGqiWWdaSue",
+    passwordHash: "$2a$10$Fs0N7KD/xUH4NAfW2s1MoOh/yH3G7mAtGycMY5tMUvCGqiWWdaSue", // 'asdf' in plain text
     role: "admin",
   }),
   models.User.create({
