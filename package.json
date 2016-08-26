@@ -9,9 +9,9 @@
   "scripts": {
     "lint": "eslint ./**/*.js || true",
     "lint:fix": "eslint ./**/*.js --fix",
-    "start": "node ./config/npm-check-dev.js && nodemon app.js || node app.js",
+    "start": "node ./scripts/check_dev.js && nodemon app.js || node app.js",
     "pm2:start": "pm2 start -n myapp-backend app.js",
-    "db": "node db/node_script",
+    "db": "node ./scripts/db.js",
     "test": "istanbul cover node_modules/mocha/bin/_mocha --require test/testhelper.js test/**/*.js",
     "test:noc": "mocha --require test/testhelper.js test/**/*.js",
     "test:watch": "npm run test -- --watch"
@@ -30,8 +30,7 @@
     "jwt-simple": "^0.5.0",
     "moment": "^2.14.1",
     "mongoose": "^4.5.8",
-    "morgan": "^1.7.0",
-    "nodemon": "^1.9.1"
+    "morgan": "^1.7.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
@@ -42,6 +41,7 @@
     "istanbul": "^0.4.3",
     "mocha": "2.4.5",
     "nock": "^8.0.0",
+    "nodemon": "^1.9.1",
     "sinon": "^1.17.3",
     "supertest": "^1.2.0"
   }

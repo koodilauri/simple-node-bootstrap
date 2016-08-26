@@ -1,7 +1,6 @@
 "use strict";
 
-const jwt = require("jwt-simple");
-const secret = process.env.TOKEN_SECRET;
+const TokenGenerator = require("../services/TokenGenerator");
 
 /**
  * Authentication middleware that is called before any requests
@@ -19,7 +18,7 @@ module.exports.authenticate = (req, res, next) => {
   const token = req.headers["x-access-token"];
   let decoded;
   try {
-    decoded = jwt.decode(token, secret);
+    decoded = TokenGenerator.decodeToken(token);
   }
   catch (err) {
     return res.status(401).send({
@@ -32,7 +31,6 @@ module.exports.authenticate = (req, res, next) => {
       message: "Token has expired",
     });
   } else {
-    // console.log("autentikoitu!");
     req.user = decoded.user;
     next();
   }

@@ -1,5 +1,3 @@
-// const connection = require("./db_connection");
-// const mongoose = require('mongoose');
 const mongoose = require("./db_connection");
 
 const Schema = mongoose.Schema;

@@ -2,6 +2,7 @@
 
 const TokenGenerator = require("../services/TokenGenerator");
 const passwordHelper = require("../config/passwordHelper");
+const val = require("../config/validations");
 
 const User = require("../models/User");
 
@@ -95,11 +96,12 @@ module.exports.deleteOne = (req, res, next) => {
 };
 
 module.exports.loginUser = (req, res, next) => {
+  val.validate(req.body)
   User
   .findOne({ email: req.body.email })
   .then(user => {
     if (!user) {
-      throw new errors.NotFoundError("No user found.");
+      throw new errors.NotFoundError("No user found with given email.");
     } else {
       if (!passwordHelper.comparePassword(req.body.password, user.passwordHash)) {
         throw new errors.AuthenticationError("Incorrect password.");

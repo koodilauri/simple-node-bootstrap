@@ -1,20 +1,20 @@
 "use strict";
 
-const Item = require("../models/Item");
+const val = require("../config/validations");
 
-const ValidationError = require("../config/errors").ValidationError;
+const Item = require("../models/Item");
 
 module.exports.findAll = (req, res, next) => {
   Item
   .findAll()
   .then(items => {
-    throw new ValidationError("No User found.");
     res.status(200).send(items);
   })
   .catch(err => next(err));
 };
 
 module.exports.saveOne = (req, res, next) => {
+  val.validate("item", "saveOne", req.body);
   Item
   .saveOne(req.body)
   .then(item => {
@@ -25,7 +25,7 @@ module.exports.saveOne = (req, res, next) => {
 
 module.exports.updateOne = (req, res, next) => {
   Item
-  .update(req.body, { id: req.params.id })
+  .updateById(req.body, req.params.id)
   .then(item => {
     res.status(200).send(item);
   })
