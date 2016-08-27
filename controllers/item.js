@@ -1,7 +1,5 @@
 "use strict";
 
-const val = require("../config/validations");
-
 const Item = require("../models/Item");
 
 module.exports.findAll = (req, res, next) => {
@@ -14,7 +12,6 @@ module.exports.findAll = (req, res, next) => {
 };
 
 module.exports.saveOne = (req, res, next) => {
-  val.validate("item", "saveOne", req.body);
   Item
   .saveOne(req.body)
   .then(item => {

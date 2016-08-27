@@ -4,6 +4,7 @@ const express = require("express");
 const router = new express.Router();
 
 const auth = require("../middleware/authentication");
+const validate = require("../middleware/validateBody");
 const errorHandler = require("../middleware/errorHandler");
 
 const itemCtrl = require("../controllers/item");
@@ -17,7 +18,7 @@ const authTest = (req, res) => {
 
 router.get("/auth", auth.authenticate, authTest);
 
-router.post("/login", userCtrl.loginUser);
+router.post("/login", validate.validateBody("user", "login"), userCtrl.loginUser);
 router.post("/user", userCtrl.saveOne);
 
 // router.use("", auth.authenticate);

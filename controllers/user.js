@@ -2,7 +2,6 @@
 
 const TokenGenerator = require("../services/TokenGenerator");
 const passwordHelper = require("../config/passwordHelper");
-const val = require("../config/validations");
 
 const User = require("../models/User");
 
@@ -36,7 +35,7 @@ module.exports.updateOne = (req, res, next) => {
   })
   .then(foundUser => {
     if (!foundUser) {
-      throw new errors.ValidationError("No User found.");
+      throw new errors.BadRequestError("No User found.");
     } else if (user.password && !passwordHelper.comparePassword(user.password, foundUser.passwordHash)) {
       throw new errors.AuthenticationError("Wrong password.");
     }
@@ -61,16 +60,16 @@ module.exports.saveOne = (req, res, next) => {
   Promise.resolve()
   .then(() => {
     if (!user.firstname || !user.lastname || !user.email || !user.password) {
-      throw new errors.ValidationError("Missing fields.");
+      throw new errors.BadRequestError("Missing fields.");
     } else if (user.password < 8) {
-      throw new errors.ValidationError("Password too short.");
+      throw new errors.BadRequestError("Password too short.");
     } else {
       return User.findOne({ email: user.email });
     }
   })
   .then(foundUser => {
     if (foundUser) {
-      throw new errors.ValidationError("User already exists with the same email.");
+      throw new errors.BadRequestError("User already exists with the same email.");
     } else {
       user.passwordHash = passwordHelper.hashPassword(user.password);
       return User.saveOne(user);
@@ -96,7 +95,6 @@ module.exports.deleteOne = (req, res, next) => {
 };
 
 module.exports.loginUser = (req, res, next) => {
-  val.validate(req.body)
   User
   .findOne({ email: req.body.email })
   .then(user => {
