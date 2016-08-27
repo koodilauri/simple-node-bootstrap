@@ -24,18 +24,18 @@ module.exports.updateOne = (req, res, next) => {
     if (req.user.id.toString() !== req.params.id && req.user.role !== "admin") {
       throw new errors.ForbiddenError("Missing privileges to edit User.");
     } else if (!user.password && req.user.role !== "admin") {
-      throw new errors.AuthenticationError("No password supplied.");
+      throw new errors.BadRequestError("No password supplied.");
     } else if (user.newPassword && !user.newPasswordConf || !user.newPassword && user.newPasswordConf) {
-      throw new errors.AuthenticationError("No new password or confirmation.");
+      throw new errors.BadRequestError("No new password or confirmation.");
     } else if (user.newPassword && user.newPasswordConf && user.newPassword !== user.newPasswordConf) {
-      throw new errors.AuthenticationError("New password didn't match confirmation.");
+      throw new errors.BadRequestError("New password didn't match confirmation.");
     } else {
       return User.findOne({ id: req.params.id });
     }
   })
   .then(foundUser => {
     if (!foundUser) {
-      throw new errors.BadRequestError("No User found.");
+      throw new errors.NotFoundError("No User found.");
     } else if (user.password && !passwordHelper.comparePassword(user.password, foundUser.passwordHash)) {
       throw new errors.AuthenticationError("Wrong password.");
     }
@@ -49,7 +49,7 @@ module.exports.updateOne = (req, res, next) => {
     return User.update(strippedUser, { id: req.params.id });
   })
   .then(rows => {
-    res.status(200).send();
+    res.sendStatus(200);
   })
   .catch(err => next(err));
 };
@@ -57,16 +57,7 @@ module.exports.updateOne = (req, res, next) => {
 module.exports.saveOne = (req, res, next) => {
   const user = req.body;
 
-  Promise.resolve()
-  .then(() => {
-    if (!user.firstname || !user.lastname || !user.email || !user.password) {
-      throw new errors.BadRequestError("Missing fields.");
-    } else if (user.password < 8) {
-      throw new errors.BadRequestError("Password too short.");
-    } else {
-      return User.findOne({ email: user.email });
-    }
-  })
+  User.findOne({ email: user.email })
   .then(foundUser => {
     if (foundUser) {
       throw new errors.BadRequestError("User already exists with the same email.");
@@ -76,7 +67,7 @@ module.exports.saveOne = (req, res, next) => {
     }
   })
   .then(savedUser => {
-    res.status(200).send();
+    res.sendStatus(200);
   })
   .catch(err => next(err));
 };
@@ -86,7 +77,7 @@ module.exports.deleteOne = (req, res, next) => {
   .delete({ id: req.params.id })
   .then(deletedRows => {
     if (deletedRows !== 0) {
-      res.status(200).send();
+      res.sendStatus(200);
     } else {
       throw new errors.NotFoundError("No user found.");
     }
