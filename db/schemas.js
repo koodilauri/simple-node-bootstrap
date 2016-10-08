@@ -1,5 +1,3 @@
-// const connection = require("./db_connection");
-// const mongoose = require('mongoose');
 const mongoose = require("./db_connection");
 
 const Schema = mongoose.Schema;
@@ -17,6 +15,7 @@ const UserSchema = new Schema({
   lastname: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   passwordHash: { type: String, required: true },
+  role: { type: String, required: true },
 });
 
 module.exports = {

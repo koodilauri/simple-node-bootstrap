@@ -16,7 +16,6 @@ class TokenGenerator {
       created: date,
       expires: date.setDate(date.getDate() + 14),
     };
-    // console.log(payload);
     return jwt.encode(payload, this.secret);
   }
   decodeToken(token) {
