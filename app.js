@@ -24,13 +24,26 @@ if (process.env.NODE_ENV !== "production") {
   app.use(logger("dev"));
 }
 
+/**
+ * Busboy is used for parsing data received as form-data such as file uploads.
+ */
 app.use(busboy());
+/**
+ * Body parser parses the request body from http-requests that have it.
+ */
 app.use(bodyParser.urlencoded({
   extended: true,
 }));
 app.use(bodyParser.json());
+/**
+ * CORS is shorthand for "Cross-Origin-Resource-Sharing" which means that this API
+ * will accept request made outside its native port.
+ */
 app.use(cors());
 
+/**
+ * This loads the routes defined in ./config/routes to the root path "".
+ */
 app.use("", require("./config/routes"));
 
 /**

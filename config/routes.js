@@ -21,7 +21,7 @@ router.get("/auth", auth.authenticate, authTest);
 router.post("/login", validate.validateBody("user", "login"), userCtrl.loginUser);
 router.post("/user", validate.validateBody("user", "save"), userCtrl.saveOne);
 
-// router.use("", auth.authenticate);
+router.use("", auth.authenticate);
 
 // Routes for all users
 
@@ -34,7 +34,7 @@ router.put("/user/:id", userCtrl.updateOne);
 
 // Routes accessisable only for admin
 
-// router.use("", auth.onlyAdmin);
+router.use("", auth.onlyAdmin);
 
 router.get("/user", userCtrl.findAll);
 router.delete("/user/:id", userCtrl.deleteOne);

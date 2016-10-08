@@ -18,7 +18,7 @@ module.exports.handleErrors = (err, req, res, next) => {
         });
       }
     } else {
-      res.status(statusCode).send("virhe");
+      res.status(statusCode).send("Error");
     }
   } else {
     next();

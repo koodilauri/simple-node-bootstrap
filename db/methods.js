@@ -71,5 +71,5 @@ module.exports.dump = () => {
 
 module.exports.resetTestData = () => {
   return module.exports.destroyTables()
-  .then(() => module.exports.addTestData())
+    .then(() => module.exports.addTestData())
 };

@@ -1,6 +1,7 @@
 "use strict";
 
 const TokenGenerator = require("../services/TokenGenerator");
+const errors = require("../config/errors");
 
 /**
  * Authentication middleware that is called before any requests
@@ -11,9 +12,7 @@ const TokenGenerator = require("../services/TokenGenerator");
  */
 module.exports.authenticate = (req, res, next) => {
   if (!req.headers["x-access-token"]) {
-    return res.status(401).send({
-      message: "Please make sure your request has X-Access-Token header",
-    });
+    throw new errors.AuthenticationError("Please make sure your request has X-Access-Token header");
   }
   const token = req.headers["x-access-token"];
   let decoded;
@@ -21,15 +20,10 @@ module.exports.authenticate = (req, res, next) => {
     decoded = TokenGenerator.decodeToken(token);
   }
   catch (err) {
-    return res.status(401).send({
-      message: "Token authentication failed",
-      error: err.message,
-    });
+    throw new errors.AuthenticationError("Token authentication failed", err);
   }
   if (decoded.created > decoded.expires) {
-    return res.status(401).send({
-      message: "Token has expired",
-    });
+    throw new errors.AuthenticationError("Token has expired");
   } else {
     req.user = decoded.user;
     next();
@@ -40,8 +34,6 @@ module.exports.onlyAdmin = (req, res, next) => {
   if (req.user && req.user.role === "admin") {
     next();
   } else {
-    res.status(401).send({
-      message: "User privilege check failed",
-    });
+    throw new errors.ForbiddenError("User admin permission check failed");
   }
 };
