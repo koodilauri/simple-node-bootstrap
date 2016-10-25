@@ -18,8 +18,12 @@ const authTest = (req, res) => {
 
 router.get("/auth", auth.authenticate, authTest);
 
-router.post("/login", validate.validateBody("user", "login"), userCtrl.loginUser);
-router.post("/user", validate.validateBody("user", "save"), userCtrl.saveOne);
+router.post("/login",
+  validate.validateBody("user", "login"),
+  userCtrl.loginUser);
+router.post("/user",
+  validate.validateBody("user", "save"),
+  userCtrl.saveOne);
 
 router.use("", auth.authenticate);
 
@@ -27,7 +31,9 @@ router.use("", auth.authenticate);
 
 router.get("/item", itemCtrl.findAll);
 router.put("/item/:id", itemCtrl.updateOne);
-router.post("/item", validate.validateBody("item", "save"), itemCtrl.saveOne);
+router.post("/item",
+  validate.validateBody("item", "save"),
+  itemCtrl.saveOne);
 // router.delete("/item/:id", itemCtrl.deleteOne);
 
 router.put("/user/:id", userCtrl.updateOne);

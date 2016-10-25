@@ -1,5 +1,8 @@
 "use strict";
 
+/**
+ * Unmade middleware for parsing headers if it's needed
+ */
 module.exports.parseHeader = (req, res, next) => {
   // if (!req.headers["x-access-token"]) {
   //   return res.status(401).send({

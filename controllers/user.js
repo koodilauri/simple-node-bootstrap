@@ -23,12 +23,10 @@ module.exports.updateOne = (req, res, next) => {
   .then(() => {
     if (req.user.id.toString() !== req.params.id && req.user.role !== "admin") {
       throw new errors.ForbiddenError("Missing privileges to edit User.");
-    } else if (!user.password && req.user.role !== "admin") {
+    } else if (req.user.id.toString() === req.params.id && !user.password) {
       throw new errors.BadRequestError("No password supplied.");
-    } else if (user.newPassword && !user.newPasswordConf || !user.newPassword && user.newPasswordConf) {
-      throw new errors.BadRequestError("No new password or confirmation.");
-    } else if (user.newPassword && user.newPasswordConf && user.newPassword !== user.newPasswordConf) {
-      throw new errors.BadRequestError("New password didn't match confirmation.");
+    } else if (req.user.id.toString() === req.params.id && user.newPassword && user.newPassword.length < 8) {
+      throw new errors.BadRequestError("New password is under 8 characters.");
     } else {
       return User.findOne({ id: req.params.id });
     }
@@ -42,7 +40,7 @@ module.exports.updateOne = (req, res, next) => {
     const strippedUser = Object.assign({}, user);
     if (req.user.id.toString() === req.params.id) {
       delete strippedUser.role;
-      if (user.newPassword && user.newPasswordConf) {
+      if (user.newPassword) {
         strippedUser.passwordHash = passwordHelper.hashPassword(user.newPassword);
       }
     }
@@ -55,15 +53,14 @@ module.exports.updateOne = (req, res, next) => {
 };
 
 module.exports.saveOne = (req, res, next) => {
-  const user = req.body;
-
-  User.findOne({ email: user.email })
+  User
+  .findOne({ email: req.body.email })
   .then(foundUser => {
     if (foundUser) {
       throw new errors.BadRequestError("User already exists with the same email.");
     } else {
-      user.passwordHash = passwordHelper.hashPassword(user.password);
-      return User.saveOne(user);
+      req.body.passwordHash = passwordHelper.hashPassword(req.body.password);
+      return User.saveOne(req.body);
     }
   })
   .then(savedUser => {
@@ -91,17 +88,15 @@ module.exports.loginUser = (req, res, next) => {
   .then(user => {
     if (!user) {
       throw new errors.NotFoundError("No user found with given email.");
+    } else if (!passwordHelper.comparePassword(req.body.password, user.passwordHash)) {
+      throw new errors.AuthenticationError("Incorrect password.");
     } else {
-      if (!passwordHelper.comparePassword(req.body.password, user.passwordHash)) {
-        throw new errors.AuthenticationError("Incorrect password.");
-      } else {
-        const token = TokenGenerator.generateToken(user);
-        user.passwordHash = undefined;
-        res.status(200).send({
-          user,
-          token,
-        });
-      }
+      const token = TokenGenerator.generateLoginToken(user);
+      user.passwordHash = undefined;
+      res.status(200).send({
+        user,
+        token,
+      });
     }
   })
   .catch(err => next(err));

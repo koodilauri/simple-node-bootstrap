@@ -7,6 +7,9 @@ const sanitizations = require("../config/bodyValidations").sanitizations;
 const validations = require("../config/bodyValidations").validations;
 const errors = require("../config/errors");
 
+/**
+ * Validation for requests' JSON-bodies
+ */
 module.exports.validateBody = (name, schema) => (req, res, next) => {
   const sanitization = _.get(sanitizations, `${name}.${schema}`);
   if (sanitization) {
@@ -17,7 +20,7 @@ module.exports.validateBody = (name, schema) => (req, res, next) => {
   if (validation) {
     const result = inspector.validate(validation, req.body);
     if (result.error.length !== 0) {
-      throw new errors.BadRequestError("Request body failed validation check.", result)
+      throw new errors.BadRequestError(result.error[0].message);
     }
   }
   next();

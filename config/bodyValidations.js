@@ -2,39 +2,19 @@ const sanitizations = {
   user: {
     login: {
       type: "object",
-      strict: true,
       properties: {
-        // firstname: { type: "string", rules: ["trim", "title"] },
-        // lastname: { type: "string", rules: ["trim", "title"] },
-        // jobs: {
-        //   type: "array",
-        //   splitWith: ",",
-        //   items: { type: "string", rules: ["trim", "title"] }
-        // },
-        email: { type: "string", rules: ["trim", "lower"] },
-        password: { type: "string" }
+        email: { type: "string", rules: ["trim", "lower"] }
       }
     },
     save: {
-      strict: true,
       type: "object",
       properties: {
-        firstname: { type: "string", },
-        lastname: { type: "string", },
-        email: { type: "string", },
-        password: { type: "string", },
+        firstname: { type: "string", rules: ["trim", "title"] },
+        lastname: { type: "string", rules: ["trim", "title"] },
+        email: { type: "string", rules: ["trim", "lower"] }
       }
-    }
+    },
   },
-  item: {
-    save: {
-      type: "object",
-      strict: true,
-      properties: {
-        content: { type: "string", minLength: 1 }
-      }
-    }
-  }
 };
 
 const validations = {

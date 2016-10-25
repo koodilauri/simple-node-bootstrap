@@ -10,3 +10,7 @@ deploy:
   app: simple-node-bootstrap
   on:
     repo: TeemuKoivisto/simple-node-bootstrap
+notifications:
+  email:
+    on_success: never
+    on_failure: never
