@@ -1,7 +1,7 @@
 "use strict";
 
 const TokenGenerator = require("../services/TokenGenerator");
-const passwordHelper = require("../config/passwordHelper");
+const PasswordHelper = require("../services/PasswordHelper");
 
 const User = require("../models/User");
 
@@ -34,14 +34,15 @@ module.exports.updateOne = (req, res, next) => {
   .then(foundUser => {
     if (!foundUser) {
       throw new errors.NotFoundError("No User found.");
-    } else if (user.password && !passwordHelper.comparePassword(user.password, foundUser.passwordHash)) {
+    } else if (req.user.id.toString() === req.params.id && user.password &&
+      !PasswordHelper.comparePassword(user.password, foundUser.passwordHash)) {
       throw new errors.AuthenticationError("Wrong password.");
     }
     const strippedUser = Object.assign({}, user);
     if (req.user.id.toString() === req.params.id) {
       delete strippedUser.role;
       if (user.newPassword) {
-        strippedUser.passwordHash = passwordHelper.hashPassword(user.newPassword);
+        strippedUser.passwordHash = PasswordHelper.hashPassword(user.newPassword);
       }
     }
     return User.update(strippedUser, { id: req.params.id });
@@ -59,7 +60,7 @@ module.exports.saveOne = (req, res, next) => {
     if (foundUser) {
       throw new errors.BadRequestError("User already exists with the same email.");
     } else {
-      req.body.passwordHash = passwordHelper.hashPassword(req.body.password);
+      req.body.passwordHash = PasswordHelper.hashPassword(req.body.password);
       return User.saveOne(req.body);
     }
   })
@@ -88,14 +89,16 @@ module.exports.loginUser = (req, res, next) => {
   .then(user => {
     if (!user) {
       throw new errors.NotFoundError("No user found with given email.");
-    } else if (!passwordHelper.comparePassword(req.body.password, user.passwordHash)) {
+    } else if (!PasswordHelper.comparePassword(req.body.password, user.passwordHash)) {
       throw new errors.AuthenticationError("Incorrect password.");
     } else {
-      const token = TokenGenerator.generateLoginToken(user);
+      const payload = TokenGenerator.generateLoginPayload(user);
+      const token = TokenGenerator.generateToken(payload);
       user.passwordHash = undefined;
       res.status(200).send({
         user,
         token,
+        expires: payload.expires,
       });
     }
   })

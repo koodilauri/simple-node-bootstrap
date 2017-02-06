@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 mongoose.Promise = global.Promise;
 
 mongoose.connection.on("connected", () => {
-  console.log("Connected to " + process.env.DB_URL);
+  console.log(`Connected to ${process.env.DB_URL}`);
 });
 
 // If the connection throws an error

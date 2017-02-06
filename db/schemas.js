@@ -4,9 +4,9 @@ const Schema = mongoose.Schema;
 
 const ItemSchema = new Schema({
   created: { type: Date, default: Date.now },
-  owner: {type: Schema.Types.ObjectId, ref: "User"},
+  owner: { type: Schema.Types.ObjectId, ref: "User" },
   content: { type: String, required: true },
-  users: [{type: Schema.Types.ObjectId, ref: "User"}],
+  users: [{ type: Schema.Types.ObjectId, ref: "User" }],
 });
 
 const UserSchema = new Schema({
