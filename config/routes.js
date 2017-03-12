@@ -25,7 +25,7 @@ router.post("/user",
   validate.validateBody("user", "save"),
   userCtrl.saveOne);
 
-router.use("", auth.authenticate);
+// router.use("", auth.authenticate);
 
 // Routes for all users
 
